@@ -1,5 +1,5 @@
 {
-  "name": "seed-element",
+  "name": "image-comparator",
   "version": "0.1",
   "authors": [
     "Eduardo Aguilar Tirado"
@@ -9,7 +9,7 @@
     "web-component",
     "polymer"
   ],
-  "main": "seed-element.html",
+  "main": "image-comparator.html",
   "ignore": [
       "**/.*",
       "/.*",
