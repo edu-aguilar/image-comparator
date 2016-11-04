@@ -1,22 +1,24 @@
 {
   "name": "seed-element",
-  "version": "1.0.7",
+  "version": "0.1",
   "authors": [
-    "Anonymous <anonymous@example.com>"
+    "Eduardo Aguilar Tirado"
   ],
-  "description": "An element providing a solution to no problem in particular.",
+  "description": "an image-comparator polymer based",
   "keywords": [
     "web-component",
-    "polymer",
-    "seed"
+    "polymer"
   ],
   "main": "seed-element.html",
-  "license": "http://polymer.github.io/LICENSE.txt",
-  "homepage": "https://github.com/<USERNAME>/seed-element/",
   "ignore": [
-    "/.*",
-    "/test/"
+      "**/.*",
+      "/.*",
+      "/test/",
+      "node_modules",
+      "bower_components",
+      "README.md"
   ],
+  "license": "http://polymer.github.io/LICENSE.txt",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.2.0"
   },

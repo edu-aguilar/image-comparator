@@ -11,17 +11,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../polymer/polymer.html">
 
 <!--
-An element providing a solution to no problem in particular.
+An element that provides to user compare two images, allowing resize and change the opacity of the foreground image.
 
 Example:
 
-    <seed-element></seed-element>
+    <image-comparator></image-comparator>
 
 Example:
 
-    <seed-element>
-      <h2>Hello seed-element</h2>
-    </seed-element>
+    <image-comparator>
+      <h2>Hello image-comparator</h2>
+    </image-comparator>
 
 @demo demo/index.html
 @hero hero.svg
@@ -32,25 +32,39 @@ Example:
     <style>
       :host {
         display: block;
-        box-sizing: border-box;
+        position: relative;
       }
-
-      .author img {
-        display: block;
-        float: left;
-        margin-right: 5px;
-        max-height: 100px;
-        max-width: 100px;
+      .comparative-slider-wrapper {
+        position: relative;
+        margin: 0 auto;
+      }
+      .vertical-bar {
+        height: 100%;
+        width: 20px;
+        background-color: red;
+        position: absolute;
+        z-index: 15;
+      }
+      .image {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+      .foreground {
+        z-index: 10;
+      }
+      .background {
+        z-index: 5;
       }
     </style>
 
-    <h1>&lt;seed-element&gt;</h1>
     <content></content>
-    <p class="author">
-      <img src$="{{author.image}}">
-      Cheers,<br/>
-      <span class="name">{{author.name}}</span>
-    </p>
+    <div id="comparativeSliderWrapper" class="comparative-slider-wrapper" style="width: {{size.width}}; height: {{size.height}};">
+      <div id="verticalBar" class="vertical-bar" on-track="handleTrack" style="left: {{separationPixels}}">{{message}}</div>
+      <img id="foregroundImg" class="image foreground" style="width: {{separationPixels}};" src="{{img1}}" alt="" />
+      <img id="backImg" class="image background" src="{{img2}}" alt="" />
+    </div>
   </template>
 
   <script>
@@ -59,35 +73,37 @@ Example:
 
       properties: {
         /**
-         * `fancy` indicates that the element should don a monocle and tophat,
-         * while checking its pocket watch.
+         * Set the component dimensions, in pixels
+         *
+         * @type {{width: string, height: string}}
          */
-        fancy: Boolean,
+        size: Object,
 
         /**
-         * Describes the author of the element, but is really just an excuse to
-         * show off JSDoc annotations.
-         *
-         * @type {{name: string, image: string}}
+         * The `img1` property define the foreground image.
          */
-        author: {
-          type: Object,
-          // Use `value` to provide a default value for a property, by setting it
-          // on your element's prototype.
-          //
-          // If you provide a function, as we do here, Polymer will call that
-          // _per element instance_.
-          //
-          // We do that to ensure that each element gets its own copy of the
-          // value, rather than having it shared across all instances (via the
-          // prototype).
-          value: function() {
-            return {
-              name:  'Dimitri Glazkov',
-              image: 'http://addyosmani.com/blog/wp-content/uploads/2013/04/unicorn.jpg',
-            };
-          }
-        },
+        img1: String,
+
+        /**
+         * The `img2` property define the background image.
+         */
+        img2: String,
+
+        /**
+         * separationPixels set the initial width of the foreground image.
+         */
+        separationPixels: String,
+
+        //private
+        /**
+         * separationValue
+         */
+        separationValue: Number,
+
+        /**
+         * maxWidth
+         */
+        maxWidth: Number
       },
 
       // Element Lifecycle
@@ -99,6 +115,8 @@ Example:
         //
         // This is the point where you should make modifications to the DOM (when
         // necessary), or kick off any processes the element wants to perform.
+        this.maxWidth = this.$.backImg.width;
+        this._checkInitialValues();
       },
 
       attached: function() {
@@ -120,32 +138,39 @@ Example:
       // Element Behavior
 
       /**
-       * Sometimes it's just nice to say hi.
+       *  The handler for on-track gesture
        *
        * @param {string} greeting A positive greeting.
-       * @return {string} The full greeting.
+       * @return {void}
        */
-      sayHello: function(greeting) {
-        var response = greeting || 'Hello World!';
-        return 'seed-element says, ' + response;
-      },
+       handleTrack: function(e) {
+         var wrapperDistance = this.$.comparativeSliderWrapper.getBoundingClientRect();
+         var verticalBarDistance = this.$.verticalBar.getBoundingClientRect();
+         var addition = e.detail.ddx ? e.detail.ddx : 1;
+         this.separationValue = verticalBarDistance.left - wrapperDistance.left + addition;
+         if (this.separationValue > 0 && this.separationValue < this.maxWidth) {
+           this.separationPixels = this.separationValue + 'px';
+         }
+       },
 
-      /**
-       * The `seed-element-lasers` event is fired whenever `fireLasers` is called.
+       /**
        *
-       * @event seed-element-lasers
-       * @detail {{sound: String}}
+       *  This function fire all minor checkers
        */
+       _checkInitialValues: function() {
+         //separationPixels value is inside width value.
+         this._correctSeparation();
+       },
 
-      /**
-       * Attempt to destroy this element's enemies with a beam of light!
+       /**
        *
-       * Or, at least, dispatch an event in the vain hope that someone else will
-       * do the zapping.
+       *  This function check that separationPixels value is between image dimensions.
        */
-      fireLasers: function() {
-        this.fire('seed-element-lasers', {sound: 'Pew pew!'});
-      }
+       _correctSeparation: function() {
+         var tmpSeparationPixels = parseInt(this.separationPixels.replace('px', ''));
+         var maxWidth = this.maxWidth;
+         this.separationPixels = tmpSeparationPixels > maxWidth ? maxWidth + 'px' : tmpSeparationPixels + 'px';
+       }
     });
   </script>
 </dom-module>
